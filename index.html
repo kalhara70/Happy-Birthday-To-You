@@ -14,36 +14,48 @@
       height: 100%;
       font-family: Arial, sans-serif;
     }
-    canvas {
+
+    #wrapper {
       position: absolute;
       top: 0;
       left: 0;
+      width: 100vh;
+      height: 100vw;
       transform: rotate(90deg) translateY(-100%);
       transform-origin: top left;
+      overflow: hidden;
     }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
     .text-overlay {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: rotate(90deg);
-      transform-origin: center;
+      top: 0;
+      left: 0;
+      width: 100vh;
+      height: 100vw;
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 100vw;
-      height: 100vh;
       pointer-events: none;
       z-index: 10;
-      text-align: center;
+      transform: rotate(90deg) translateY(-100%);
+      transform-origin: top left;
     }
+
     .birthday-text {
-      font-size: 300px;
+      font-size: 180px;
       font-weight: bold;
       color: #ff69b4;
       text-shadow: 0 0 20px #ff69b4, 0 0 40px #ff69b4;
       opacity: 0;
       animation: fadeInOut 6s ease-in-out forwards;
     }
+
     @keyframes fadeInOut {
       0% { opacity: 0; transform: scale(0.5); }
       15% { opacity: 1; transform: scale(1.1); }
@@ -54,7 +66,9 @@
   </style>
 </head>
 <body>
-  <canvas id="matrix"></canvas>
+  <div id="wrapper">
+    <canvas id="matrix"></canvas>
+  </div>
   <div class="text-overlay">
     <div id="birthday-text" class="birthday-text">3</div>
   </div>
@@ -68,10 +82,11 @@
       canvas.width = window.innerHeight;
       canvas.height = window.innerWidth;
     }
+
     setCanvasSize();
 
     const sinhalaLetters = 'アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const fontSize = 16;
+    const fontSize = 12;
     let columns = Math.floor(canvas.width / fontSize);
     let drops = Array(columns).fill(1);
 
@@ -82,7 +97,8 @@
       { text: '1', duration: 2000 },
       { text: 'Happy', duration: 2000 },
       { text: 'Birthday', duration: 2000 },
-      { text: 'To You', duration: 2000 }
+      { text: 'To', duration: 2000 },
+      { text: 'You', duration: 2000 }
     ];
 
     let currentIndex = 0;
@@ -103,6 +119,41 @@
           drops[i] = 0;
         }
         drops[i]++;
+      }
+
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - animationStartTime;
+
+      if (elapsedTime >= sequence[currentIndex].duration) {
+        currentIndex++;
+
+        if (currentIndex >= sequence.length) {
+          window.location.href = "home.html"; // redirect to another page
+          return;
+        }
+
+        animationStartTime = currentTime;
+        birthdayText.textContent = sequence[currentIndex].text;
+        birthdayText.style.animation = 'none';
+        birthdayText.offsetHeight; // force reflow
+        birthdayText.style.animation = 'fadeInOut 6s ease-in-out forwards';
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      setCanvasSize();
+      columns = Math.floor(canvas.width / fontSize);
+      drops = Array(columns).fill(1);
+    });
+
+    setInterval(draw, 33);
+
+    // Initial animation
+    birthdayText.textContent = sequence[0].text;
+    birthdayText.style.animation = 'fadeInOut 6s ease-in-out forwards';
+  </script>
+</body>
+</html>
       }
 
       const currentTime = Date.now();
