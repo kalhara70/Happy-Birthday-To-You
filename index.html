@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sinhala Matrix Birthday Animation - Landscape</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: black;
+      width: 100%;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: rotate(90deg) translateY(-100%);
+      transform-origin: top left;
+    }
+    .text-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: rotate(90deg);
+      transform-origin: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 10;
+      text-align: center;
+    }
+    .birthday-text {
+      font-size: 300px;
+      font-weight: bold;
+      color: #ff69b4;
+      text-shadow: 0 0 20px #ff69b4, 0 0 40px #ff69b4;
+      opacity: 0;
+      animation: fadeInOut 6s ease-in-out forwards;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: scale(0.5); }
+      15% { opacity: 1; transform: scale(1.1); }
+      30% { opacity: 1; transform: scale(1); }
+      85% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.8); }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <div class="text-overlay">
+    <div id="birthday-text" class="birthday-text">3</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    const birthdayText = document.getElementById('birthday-text');
+
+    function setCanvasSize() {
+      canvas.width = window.innerHeight;
+      canvas.height = window.innerWidth;
+    }
+    setCanvasSize();
+
+    const sinhalaLetters = 'アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const fontSize = 16;
+    let columns = Math.floor(canvas.width / fontSize);
+    let drops = Array(columns).fill(1);
+
+    const sequence = [
+      { text: ' ', duration: 2000 },
+      { text: '3', duration: 2000 },
+      { text: '2', duration: 2000 },
+      { text: '1', duration: 2000 },
+      { text: 'Happy', duration: 2000 },
+      { text: 'Birthday', duration: 2000 },
+      { text: 'To You', duration: 2000 }
+    ];
+
+    let currentIndex = 0;
+    let animationStartTime = Date.now();
+
+    function draw() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#ff69b4';
+      ctx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = sinhalaLetters[Math.floor(Math.random() * sinhalaLetters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - animationStartTime;
+
+      if (elapsedTime >= sequence[currentIndex].duration) {
+        currentIndex++;
+
+        if (currentIndex >= sequence.length) {
+          // ✅ Redirect to another page after final text
+          window.location.href = "home.html"; // <-- Change this URL to your target page
+          return;
+        }
+
+        animationStartTime = currentTime;
+        birthdayText.textContent = sequence[currentIndex].text;
+        birthdayText.style.animation = 'none';
+        birthdayText.offsetHeight;
+        birthdayText.style.animation = 'fadeInOut 6s ease-in-out forwards';
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      setCanvasSize();
+      columns = Math.floor(canvas.width / fontSize);
+      drops = Array(columns).fill(1);
+    });
+
+    setInterval(draw, 33);
+
+    // First animation
+    birthdayText.textContent = sequence[0].text;
+    birthdayText.style.animation = 'fadeInOut 6s ease-in-out forwards';
+  </script>
+</body>
+</html>
